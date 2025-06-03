@@ -2,6 +2,7 @@
 
 namespace Livewire\Features\SupportFileDownloads;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Livewire\ComponentHook;
@@ -48,7 +49,8 @@ class SupportFileDownloads extends ComponentHook
     function valueIsntAFileResponse($value)
     {
         return ! $value instanceof StreamedResponse
-            && ! $value instanceof BinaryFileResponse;
+            && ! $value instanceof BinaryFileResponse
+            && ! ($value instanceof Response && $value->headers->get('Content-Disposition'));
     }
 
     function captureOutput($callback)

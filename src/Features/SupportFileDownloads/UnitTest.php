@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\Livewire;
 use PHPUnit\Framework\ExpectationFailedException;
+use Symfony\Component\HttpFoundation\Response;
 
 class UnitTest extends \Tests\TestCase
 {
@@ -88,6 +89,20 @@ class UnitTest extends \Tests\TestCase
                 ->assertFileDownloaded('ダウンロード.csv', 'alpinejs', 'text/csv');
     }
 
+    public function test_can_download_an_inline_file_response()
+    {
+        Livewire::test(FileDownloadComponent::class)
+            ->call('downloadInlineResponse')
+            ->assertFileDownloaded('download.txt', 'Hi, Livewire!');
+    }
+
+    public function test_can_download_an_attachment_file_response()
+    {
+        Livewire::test(FileDownloadComponent::class)
+            ->call('downloadAttachmentResponse')
+            ->assertFileDownloaded('download.txt', 'Hi, Livewire!');
+    }
+
     public function test_it_refreshes_html_after_download()
     {
         Livewire::test(FileDownloadComponent::class)
@@ -134,6 +149,20 @@ class FileDownloadComponent extends Component
         return response()->streamDownload(function () {
             echo 'alpinejs';
         }, $filename, $headers);
+    }
+
+    public function downloadInlineResponse()
+    {
+        return new Response('Hi, Livewire!', 200, array(
+            'Content-Disposition' =>  'inline; filename="download.txt"',
+        ));
+    }
+
+    public function downloadAttachmentResponse()
+    {
+        return new Response('Hi, Livewire!', 200, array(
+            'Content-Disposition' =>  'attachment; filename="download.txt"',
+        ));
     }
 
     public function responsableDownload()
